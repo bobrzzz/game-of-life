@@ -11,22 +11,27 @@ window.isRunning = false;
 
 window.addEventListener('click', (e) => {
     console.log('hit', e);
-    const x = Math.ceil(e.clientX / 10);
-    const y = Math.ceil(e.clientY / 10);
+    const x = Math.round(e.clientX / 10);
+    const y = Math.round(e.clientY / 10);
     console.log(x, y);
     cells.push(new Cell(x, y));
 })
 
+const bg = two.makeRectangle(0, 0, two.width, two.height);
+bg.fill = '#111';
+bg.origin = new Vector( -1 * two.width / 2, -1 * two.height / 2);
 
 let gridX = 0;
 while(gridX < two.width) {
-    two.makeLine(gridX, 0, gridX, two.height);
+    let line = two.makeLine(gridX, 0, gridX, two.height);
+    line.stroke = '#222';
     gridX += 10;
 }
 
 let gridY = 0;
 while(gridY < two.width) {
-    two.makeLine(0, gridY, two.width, gridY);
+    let line = two.makeLine(0, gridY, two.width, gridY);
+    line.stroke = '#222'
     gridY += 10;
 }
 
@@ -51,7 +56,8 @@ class Cell {
         this.x = x;
         this.y = y;
         this.body = two.makeRectangle(x * 10 + 5, y * 10 + 5, 10, 10);
-        this.body.fill = '#000099';
+        this.body.fill = '#454ae5';
+        this.body.stroke = '#454ae5';
     }
 
     check() {
@@ -106,29 +112,29 @@ class Cell {
 
 let candidates: Candidate[] = [];
 let cells = [
-    new Cell(4,4), 
-    new Cell(3,3), 
-    new Cell(2,4), 
-    new Cell(2,3), 
-    new Cell(3,1),
+    // new Cell(4,4), 
+    // new Cell(3,3), 
+    // new Cell(2,4), 
+    // new Cell(2,3), 
+    // new Cell(3,1),
 
-    new Cell(10,9),
-    // new Cell(10,10),
-    new Cell(10,11),
+    // new Cell(10,9),
+    // // new Cell(10,10),
+    // new Cell(10,11),
 
-    new Cell(10,13),
-    // new Cell(10,14),
-    new Cell(10,15),
+    // new Cell(10,13),
+    // // new Cell(10,14),
+    // new Cell(10,15),
 
-    // new Cell(10,12),
+    // // new Cell(10,12),
 
-    new Cell(9,12),
-    // new Cell(8,12),
-    new Cell(7,12),
+    // new Cell(9,12),
+    // // new Cell(8,12),
+    // new Cell(7,12),
 
-    new Cell(11,12),
-    // new Cell(12,12),
-    new Cell(13,12),
+    // new Cell(11,12),
+    // // new Cell(12,12),
+    // new Cell(13,12),
 
 ];
 let timerElapsed = 0;
