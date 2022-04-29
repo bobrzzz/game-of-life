@@ -89,7 +89,7 @@ class Cell {
                     candidates.push({
                         x: this.x + startX, 
                         y: this.y + startY,
-                        aliveNear: 0
+                        aliveNear: 1
                     });
                 }
                 startY++;
