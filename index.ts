@@ -2,6 +2,11 @@ import Two from "two.js";
 import { Rectangle } from "two.js/src/shapes/rectangle";
 import { Vector } from "two.js/src/vector";
 
+const backgroundColor = '#111';
+const linesColor = '#222';
+const cellColor = '#454ae5';
+const cellEdgeSize = 20;
+
 const two = new Two({
     fullscreen: true,
     autostart: true
@@ -11,28 +16,28 @@ window.isRunning = false;
 
 window.addEventListener('click', (e) => {
     console.log('hit', e);
-    const x = Math.round(e.clientX / 10);
-    const y = Math.round(e.clientY / 10);
+    const x = Math.round(e.clientX / cellEdgeSize);
+    const y = Math.round(e.clientY / cellEdgeSize);
     console.log(x, y);
     cells.push(new Cell(x, y));
 })
 
 const bg = two.makeRectangle(0, 0, two.width, two.height);
-bg.fill = '#111';
+bg.fill = backgroundColor;
 bg.origin = new Vector( -1 * two.width / 2, -1 * two.height / 2);
 
 let gridX = 0;
 while(gridX < two.width) {
     let line = two.makeLine(gridX, 0, gridX, two.height);
-    line.stroke = '#222';
-    gridX += 10;
+    line.stroke = linesColor;
+    gridX += cellEdgeSize;
 }
 
 let gridY = 0;
 while(gridY < two.width) {
     let line = two.makeLine(0, gridY, two.width, gridY);
-    line.stroke = '#222'
-    gridY += 10;
+    line.stroke = linesColor
+    gridY += cellEdgeSize;
 }
 
 interface Candidate {
@@ -55,9 +60,9 @@ class Cell {
         this.toDie = false;
         this.x = x;
         this.y = y;
-        this.body = two.makeRectangle(x * 10 + 5, y * 10 + 5, 10, 10);
-        this.body.fill = '#454ae5';
-        this.body.stroke = '#454ae5';
+        this.body = two.makeRectangle(x * cellEdgeSize + cellEdgeSize / 2, y * cellEdgeSize + cellEdgeSize / 2, cellEdgeSize, cellEdgeSize);
+        this.body.fill = cellColor;
+        this.body.stroke = cellColor;
     }
 
     check() {
@@ -111,7 +116,7 @@ class Cell {
 }
 
 let candidates: Candidate[] = [];
-let cells = [
+let cells: Cell[] = [
     // new Cell(4,4), 
     // new Cell(3,3), 
     // new Cell(2,4), 
