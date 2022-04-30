@@ -1,26 +1,48 @@
 import Two from "two.js";
-import { Rectangle } from "two.js/src/shapes/rectangle";
 import { Vector } from "two.js/src/vector";
+import { Cell } from "./src/cell";
+import { Candidate } from "./src/candidate";
 
 const backgroundColor = '#111';
 const linesColor = '#222';
 const cellColor = '#454ae5';
 const cellEdgeSize = 20;
+let isRunning = false;
+let iterationsDone = 0;
+let counter: HTMLElement | null;
+let button: HTMLElement | null;
 
 const two = new Two({
     fullscreen: true,
     autostart: true
   }).appendTo(document.body);
 
-window.isRunning = false;
+window.onload = function() {
+    window.addEventListener('click', (e) => {
+        console.log('hit', e);
+        const x = Math.round(e.clientX / cellEdgeSize);
+        const y = Math.round(e.clientY / cellEdgeSize);
+        console.log(x, y);
+        cells.push(new Cell(two, x, y, cellEdgeSize, cellColor));
+    });
 
-window.addEventListener('click', (e) => {
-    console.log('hit', e);
-    const x = Math.round(e.clientX / cellEdgeSize);
-    const y = Math.round(e.clientY / cellEdgeSize);
-    console.log(x, y);
-    cells.push(new Cell(x, y));
-})
+    button = document.querySelector('.panel__button');
+    button?.addEventListener('click', (e) => {
+        e.stopImmediatePropagation();
+        toggleGame();        
+    });
+
+    counter = document.querySelector('.panel__counter');
+}
+
+function toggleGame() {
+    isRunning = !isRunning;
+    if(button) {
+        button.innerText = isRunning ? 'Pause' : 'Start';
+    }
+}
+
+
 
 const bg = two.makeRectangle(0, 0, two.width, two.height);
 bg.fill = backgroundColor;
@@ -40,80 +62,10 @@ while(gridY < two.width) {
     gridY += cellEdgeSize;
 }
 
-interface Candidate {
-    x: number,
-    y: number,
-    aliveNear: number
-}
 
 
-class Cell {
-    alive: boolean;
-    toDie: boolean;
-    body: Rectangle;
-    x: number;
-    y: number;
-    // neighbors: Cell[];
 
-    constructor(x: number, y: number) {
-        this.alive = true;
-        this.toDie = false;
-        this.x = x;
-        this.y = y;
-        this.body = two.makeRectangle(x * cellEdgeSize + cellEdgeSize / 2, y * cellEdgeSize + cellEdgeSize / 2, cellEdgeSize, cellEdgeSize);
-        this.body.fill = cellColor;
-        this.body.stroke = cellColor;
-    }
 
-    check() {
-        let aliveNear = 0;
-        let startX = -1;
-        while( startX <= 1) {
-            let startY = -1;
-            while(startY <= 1) {
-                if(startX === 0 && startY === 0) {
-                    startY++;
-                    continue;
-                }
-                let n = cells.find(cell => {
-                    return cell.x === this.x + startX
-                        && cell.y === this.y + startY
-                        && cell.alive 
-                })
-                if(n) {
-                    aliveNear++;
-                } else {
-                    let newCandidate = candidates.find(cell => {
-                        return cell.x === this.x + startX
-                        && cell.y === this.y + startY;
-                        
-                    });
-                    if(newCandidate) {
-                        newCandidate.aliveNear++;
-                    }
-                    candidates.push({
-                        x: this.x + startX, 
-                        y: this.y + startY,
-                        aliveNear: 1
-                    });
-                }
-                startY++;
-            }
-            startX++;
-        }
-
-        if(aliveNear < 2 || aliveNear > 3) {
-            this.toDie = true;
-            this.body.fill = '#009900';
-        }
-
-        // if(aliveNear === 3 && this.alive === false) {
-        //     this.toDie = true;
-        // }
-
-        console.log('Alive near', aliveNear);
-    }
-}
 
 let candidates: Candidate[] = [];
 let cells: Cell[] = [
@@ -144,6 +96,7 @@ let cells: Cell[] = [
 ];
 let timerElapsed = 0;
 
+
 two.bind('update', function() {
     if(!isRunning) {
         return;
@@ -151,22 +104,29 @@ two.bind('update', function() {
     console.log();
     timerElapsed += two.timeDelta;
     if(timerElapsed >= 1000) {
-        cells.forEach(cell => cell.check());
+        cells.forEach(cell => cell.check(cells, candidates));
         const newCells = turnCandidates(candidates);
         cells = removeDead(cells);
         cells = joinCells(cells, newCells);
         
         timerElapsed = 0;
+        iterationsDone++;
+        if(counter) {
+            counter.innerText = iterationsDone.toString();
+        }
         console.dir(cells);
         console.dir(candidates);
 
         candidates = [];
+        if(cells.length === 0) {
+            toggleGame();
+        }
     }
 
 });
 
 function turnCandidates(candidates: Candidate[]) : Cell[] {
-    return candidates.filter(q => q.aliveNear === 3).map(candidate => new Cell(candidate.x, candidate.y));
+    return candidates.filter(q => q.aliveNear === 3).map(candidate => new Cell(two, candidate.x, candidate.y, cellEdgeSize, cellColor));
 }
 
 function joinCells(a: Cell[], b: Cell[]) {
