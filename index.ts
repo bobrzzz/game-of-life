@@ -1,7 +1,7 @@
 import Two from "two.js";
-import { Vector } from "two.js/src/vector";
 import { Cell } from "./src/cell";
 import { Candidate } from "./src/candidate";
+import { createGrid } from "./src/grid";
 
 const backgroundColor = '#111';
 const linesColor = '#222';
@@ -13,10 +13,13 @@ let iterationsDone = 0;
 let counter: HTMLElement | null;
 let button: HTMLElement | null;
 
+
 const two = new Two({
     fullscreen: true,
     autostart: true
-  }).appendTo(document.body);
+}).appendTo(document.body);
+
+createGrid(two, backgroundColor, linesColor, cellEdgeSize);
 
 window.onload = function() {
     window.addEventListener('click', (e) => {
@@ -43,58 +46,8 @@ function toggleGame() {
     }
 }
 
-
-
-const bg = two.makeRectangle(0, 0, two.width, two.height);
-bg.fill = backgroundColor;
-bg.origin = new Vector( -1 * two.width / 2, -1 * two.height / 2);
-
-let gridX = 0;
-while(gridX < two.width) {
-    let line = two.makeLine(gridX, 0, gridX, two.height);
-    line.stroke = linesColor;
-    gridX += cellEdgeSize;
-}
-
-let gridY = 0;
-while(gridY < two.width) {
-    let line = two.makeLine(0, gridY, two.width, gridY);
-    line.stroke = linesColor
-    gridY += cellEdgeSize;
-}
-
-
-
-
-
-
 let candidates: Candidate[] = [];
-let cells: Cell[] = [
-    // new Cell(4,4), 
-    // new Cell(3,3), 
-    // new Cell(2,4), 
-    // new Cell(2,3), 
-    // new Cell(3,1),
-
-    // new Cell(10,9),
-    // // new Cell(10,10),
-    // new Cell(10,11),
-
-    // new Cell(10,13),
-    // // new Cell(10,14),
-    // new Cell(10,15),
-
-    // // new Cell(10,12),
-
-    // new Cell(9,12),
-    // // new Cell(8,12),
-    // new Cell(7,12),
-
-    // new Cell(11,12),
-    // // new Cell(12,12),
-    // new Cell(13,12),
-
-];
+let cells: Cell[] = [];
 let timerElapsed = 0;
 
 
