@@ -6,17 +6,21 @@ class Cell {
     alive: boolean;
     toDie: boolean;
     body: Rectangle;
+    colorAngle: number;
+    colorChangeSpeed: number;
     x: number;
     y: number;
 
-    constructor(two: Two, x: number, y: number, cellEdgeSize: number, cellColor: string) {
+    constructor(two: Two, x: number, y: number, cellEdgeSize: number, cellColor: number, colorChangeSpeed: number) {
         this.alive = true;
         this.toDie = false;
         this.x = x;
         this.y = y;
         this.body = two.makeRectangle(x * cellEdgeSize + cellEdgeSize / 2, y * cellEdgeSize + cellEdgeSize / 2, cellEdgeSize, cellEdgeSize);
-        this.body.fill = cellColor;
-        this.body.stroke = cellColor;
+        this.colorAngle = cellColor;
+        this.colorChangeSpeed = colorChangeSpeed;
+        this.changeColor(this.colorAngle);
+        //this.body.stroke = cellColor;
     }
 
     check(cells: Cell[], candidates: Candidate[]) {
@@ -61,16 +65,13 @@ class Cell {
             this.body.fill = '#009900';
         }
 
-        this.body.fill = '#' + addHexColor(this.body.fill.slice(1), '010101');
-
-        console.log('Alive near', aliveNear);
+        this.changeColor(this.colorAngle + this.colorChangeSpeed);
     }
-}
 
-function addHexColor(c1, c2) {
-  var hexStr = (parseInt(c1, 16) + parseInt(c2, 16)).toString(16);
-  while (hexStr.length < 6) { hexStr = '0' + hexStr; } // Zero pad.
-  return hexStr;
+    changeColor(angle: number) {
+        this.colorAngle = angle;
+        this.body.fill = `hsl(${angle}, 100%, 50%)`;
+    }
 }
 
 export {

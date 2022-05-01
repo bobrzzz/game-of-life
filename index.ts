@@ -5,7 +5,8 @@ import { Candidate } from "./src/candidate";
 
 const backgroundColor = '#111';
 const linesColor = '#222';
-const cellColor = '#454ae5';
+const cellColorAngle = 240;
+const colorChangeSpeed = 15;
 const cellEdgeSize = 20;
 let isRunning = false;
 let iterationsDone = 0;
@@ -23,7 +24,7 @@ window.onload = function() {
         const x = Math.round(e.clientX / cellEdgeSize);
         const y = Math.round(e.clientY / cellEdgeSize);
         console.log(x, y);
-        cells.push(new Cell(two, x, y, cellEdgeSize, cellColor));
+        cells.push(new Cell(two, x, y, cellEdgeSize, cellColorAngle, colorChangeSpeed));
     });
 
     button = document.querySelector('.panel__button');
@@ -126,7 +127,7 @@ two.bind('update', function() {
 });
 
 function turnCandidates(candidates: Candidate[]) : Cell[] {
-    return candidates.filter(q => q.aliveNear === 3).map(candidate => new Cell(two, candidate.x, candidate.y, cellEdgeSize, cellColor));
+    return candidates.filter(q => q.aliveNear === 3).map(candidate => new Cell(two, candidate.x, candidate.y, cellEdgeSize, cellColorAngle, colorChangeSpeed));
 }
 
 function joinCells(a: Cell[], b: Cell[]) {
