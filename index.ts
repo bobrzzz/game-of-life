@@ -2,54 +2,53 @@ import Two from "two.js";
 import { Cell } from "./src/cell";
 import { Candidate } from "./src/candidate";
 import { createGrid } from "./src/grid";
+import { init as initInterface, addGlobalListener, initToggleButton, initSpeedDecreaseButton, initSpeedIncreaseButton, updateCycleMeter} from "./src/interface";
+
 
 const backgroundColor = '#111';
 const linesColor = '#222';
 const cellColorAngle = 240;
 const colorChangeSpeed = 15;
-const cellEdgeSize = 20;
-let isRunning = false;
-let iterationsDone = 0;
-let counter: HTMLElement | null;
-let button: HTMLElement | null;
-
-
+const cellEdgeSize = 20; 1 * 2 / 1 / 2
+const speed = 100;
 const two = new Two({
     fullscreen: true,
     autostart: true
 }).appendTo(document.body);
 
-createGrid(two, backgroundColor, linesColor, cellEdgeSize);
-
-window.onload = function() {
-    window.addEventListener('click', (e) => {
-        console.log('hit', e);
-        const x = Math.round(e.clientX / cellEdgeSize);
-        const y = Math.round(e.clientY / cellEdgeSize);
-        console.log(x, y);
-        cells.push(new Cell(two, x, y, cellEdgeSize, cellColorAngle, colorChangeSpeed));
-    });
-
-    button = document.querySelector('.panel__button');
-    button?.addEventListener('click', (e) => {
-        e.stopImmediatePropagation();
-        toggleGame();        
-    });
-
-    counter = document.querySelector('.panel__counter');
-}
-
-function toggleGame() {
-    isRunning = !isRunning;
-    if(button) {
-        button.innerText = isRunning ? 'Pause' : 'Start';
-    }
-}
-
+let isRunning = false;
+let iterationsDone = 0;
 let candidates: Candidate[] = [];
 let cells: Cell[] = [];
 let timerElapsed = 0;
 
+function init() {
+
+    createGrid(two, backgroundColor, linesColor, cellEdgeSize);
+    initInterface().then(() => {
+        addGlobalListener(addNewCell);
+        initToggleButton(toggleGame);
+        initSpeedIncreaseButton(speedIncrease);
+        initSpeedDecreaseButton(speedDecrease);
+    })
+}
+
+
+
+
+
+function toggleGame() {
+    isRunning = !isRunning;
+    return isRunning;
+}
+
+function speedIncrease() {
+
+}
+
+function speedDecrease() {
+    
+}
 
 two.bind('update', function() {
     if(!isRunning) {
@@ -65,9 +64,10 @@ two.bind('update', function() {
         
         timerElapsed = 0;
         iterationsDone++;
-        if(counter) {
-            counter.innerText = iterationsDone.toString();
-        }
+        updateCycleMeter(iterationsDone);
+        // if(counter) {
+        //     counter.innerText = iterationsDone.toString();
+        // }
         console.dir(cells);
         console.dir(candidates);
 
@@ -78,6 +78,14 @@ two.bind('update', function() {
     }
 
 });
+
+const addNewCell = function (e: MouseEvent) { // Interesting that I needed to use function expression to solve types
+    console.log('hit', e);
+    const x = Math.round(e.clientX / cellEdgeSize);
+    const y = Math.round(e.clientY / cellEdgeSize);
+    console.log(x, y);
+    cells.push(new Cell(two, x, y, cellEdgeSize, cellColorAngle, colorChangeSpeed));
+} as (e: Event) => void;
 
 function turnCandidates(candidates: Candidate[]) : Cell[] {
     return candidates.filter(q => q.aliveNear === 3).map(candidate => new Cell(two, candidate.x, candidate.y, cellEdgeSize, cellColorAngle, colorChangeSpeed));
@@ -99,3 +107,5 @@ function removeDead(cells: Cell[]) {
 
     return alive;
 }
+
+init();
