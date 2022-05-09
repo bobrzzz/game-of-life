@@ -16,7 +16,7 @@ function init() {
 function initElements() {
     counter = document.querySelector('.panel__counter');
     gameToggleButton = document.querySelector('.panel__button');
-    speedDecreaseButton = document.getElementById('speedIncrease');
+    speedIncreaseButton = document.getElementById('speedIncrease');
     speedDecreaseButton = document.getElementById('speedDecrease');
     speedMeter = document.getElementById('speedMeter');
 }
@@ -62,9 +62,9 @@ function updateCycleMeter(cycleAmount: string | number) {
     counter.innerText = cycleAmount;
 }
 
-function updateSpeedMeter(newSpeed: string) {
+function updateSpeedMeter(newSpeed: number) {
     if(speedMeter) {
-        speedMeter.innerText = newSpeed;
+        speedMeter.innerText = newSpeed.toString();
     }
 }
 
@@ -74,5 +74,6 @@ export {
     initSpeedIncreaseButton,
     initSpeedDecreaseButton,
     addGlobalListener,
-    updateCycleMeter
+    updateCycleMeter,
+    updateSpeedMeter
 }

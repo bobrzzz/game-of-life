@@ -2,15 +2,16 @@ import Two from "two.js";
 import { Cell } from "./src/cell";
 import { Candidate } from "./src/candidate";
 import { createGrid } from "./src/grid";
-import { init as initInterface, addGlobalListener, initToggleButton, initSpeedDecreaseButton, initSpeedIncreaseButton, updateCycleMeter} from "./src/interface";
+import { init as initInterface, addGlobalListener, initToggleButton, initSpeedDecreaseButton, initSpeedIncreaseButton, updateCycleMeter, updateSpeedMeter} from "./src/interface";
 
 
 const backgroundColor = '#111';
 const linesColor = '#222';
 const cellColorAngle = 240;
 const colorChangeSpeed = 15;
-const cellEdgeSize = 20; 1 * 2 / 1 / 2
-const speed = 100;
+const cellEdgeSize = 20;
+const speedOptions = [1000, 500, 100, 50, 20];
+const speedDefaultIndex = 2;
 const two = new Two({
     fullscreen: true,
     autostart: true
@@ -21,21 +22,17 @@ let iterationsDone = 0;
 let candidates: Candidate[] = [];
 let cells: Cell[] = [];
 let timerElapsed = 0;
+let speedIndex = speedDefaultIndex;
 
 function init() {
-
     createGrid(two, backgroundColor, linesColor, cellEdgeSize);
     initInterface().then(() => {
         addGlobalListener(addNewCell);
         initToggleButton(toggleGame);
-        initSpeedIncreaseButton(speedIncrease);
-        initSpeedDecreaseButton(speedDecrease);
+        initSpeedIncreaseButton(changeSpeed(1));
+        initSpeedDecreaseButton(changeSpeed(-1));
     })
 }
-
-
-
-
 
 function toggleGame() {
     isRunning = !isRunning;
@@ -50,13 +47,30 @@ function speedDecrease() {
     
 }
 
+function changeSpeed(delta: number) {
+    return function() {
+        const tempIndex = speedIndex + delta;
+        
+        if(tempIndex < 0 || tempIndex >= speedOptions.length) {
+            return;
+        }
+
+        speedIndex = tempIndex;
+        
+        const speedRatio = speedOptions[speedDefaultIndex] / speedOptions[speedIndex];
+        updateSpeedMeter(speedRatio);
+    }
+}
+
+
+
 two.bind('update', function() {
-    if(!isRunning) {
+    if(!isRunning) { // Try dispatching from Pablo
         return;
     }
     console.log();
     timerElapsed += two.timeDelta;
-    if(timerElapsed >= 1000) {
+    if(timerElapsed >= speedOptions[speedIndex]) {
         cells.forEach(cell => cell.check(cells, candidates));
         const newCells = turnCandidates(candidates);
         cells = removeDead(cells);
@@ -65,9 +79,6 @@ two.bind('update', function() {
         timerElapsed = 0;
         iterationsDone++;
         updateCycleMeter(iterationsDone);
-        // if(counter) {
-        //     counter.innerText = iterationsDone.toString();
-        // }
         console.dir(cells);
         console.dir(candidates);
 
